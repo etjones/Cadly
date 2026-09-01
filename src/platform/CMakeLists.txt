@@ -15,7 +15,7 @@ target_compile_features(cadly_platform PUBLIC cxx_std_17)
 # under the source tree without needing an install step.
 target_compile_definitions(cadly_platform
   PRIVATE
-    CADLY_SOURCE_ROOT="${CMAKE_SOURCE_DIR}"
+    CADLY_SOURCE_ROOT="${Cadly_SOURCE_DIR}"
 )
 
 target_link_libraries(cadly_platform
