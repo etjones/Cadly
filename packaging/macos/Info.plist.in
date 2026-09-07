@@ -35,7 +35,11 @@
          fine when launched explicitly, but Launch Services won't route
          double-clicks or "Open in Cadly" to it. package-app.sh rewrites the
          rank to Owner (and the bundle id to the release id) for the
-         distributable. -->
+         distributable.
+
+         LSItemContentTypes binds each document type to the UTI exported
+         below; CFBundleTypeExtensions stays alongside it for Launch Services
+         databases that predate the export. -->
     <dict>
       <key>CFBundleTypeName</key>
       <string>STEP Model</string>
@@ -43,6 +47,10 @@
       <string>Viewer</string>
       <key>LSHandlerRank</key>
       <string>None</string>
+      <key>LSItemContentTypes</key>
+      <array>
+        <string>io.github.broccoli-97.cadly.step</string>
+      </array>
       <key>CFBundleTypeExtensions</key>
       <array>
         <string>step</string>
@@ -56,11 +64,74 @@
       <string>Viewer</string>
       <key>LSHandlerRank</key>
       <string>None</string>
+      <key>LSItemContentTypes</key>
+      <array>
+        <string>io.github.broccoli-97.cadly.iges</string>
+      </array>
       <key>CFBundleTypeExtensions</key>
       <array>
         <string>iges</string>
         <string>igs</string>
       </array>
+    </dict>
+  </array>
+  <!-- Cadly owns the STEP/IGES type identity on macOS. Neither format has a
+       system UTI (public.step does not exist), so without an exported
+       declaration Launch Services binds ".step" to whichever installed
+       bundle happens to import a type for it — and re-decides at every
+       database reseed (reboot). Shell integrations such as the Quick Look
+       extensions match on these identifiers and only *import* them; an
+       installed Cadly.app is the single exporter, so the binding survives
+       reseeds. Declarations don't take part in the default-handler
+       election, so the dev-tree bundle exporting them too is harmless. -->
+  <key>UTExportedTypeDeclarations</key>
+  <array>
+    <dict>
+      <key>UTTypeIdentifier</key>
+      <string>io.github.broccoli-97.cadly.step</string>
+      <key>UTTypeDescription</key>
+      <string>STEP Model</string>
+      <key>UTTypeConformsTo</key>
+      <array>
+        <string>public.data</string>
+        <string>public.3d-content</string>
+      </array>
+      <key>UTTypeTagSpecification</key>
+      <dict>
+        <key>public.filename-extension</key>
+        <array>
+          <string>step</string>
+          <string>stp</string>
+          <string>p21</string>
+        </array>
+        <key>public.mime-type</key>
+        <array>
+          <string>model/step</string>
+        </array>
+      </dict>
+    </dict>
+    <dict>
+      <key>UTTypeIdentifier</key>
+      <string>io.github.broccoli-97.cadly.iges</string>
+      <key>UTTypeDescription</key>
+      <string>IGES Model</string>
+      <key>UTTypeConformsTo</key>
+      <array>
+        <string>public.data</string>
+        <string>public.3d-content</string>
+      </array>
+      <key>UTTypeTagSpecification</key>
+      <dict>
+        <key>public.filename-extension</key>
+        <array>
+          <string>iges</string>
+          <string>igs</string>
+        </array>
+        <key>public.mime-type</key>
+        <array>
+          <string>model/iges</string>
+        </array>
+      </dict>
     </dict>
   </array>
 </dict>
