@@ -91,10 +91,16 @@
       <string>io.github.broccoli-97.cadly.step</string>
       <key>UTTypeDescription</key>
       <string>STEP Model</string>
+      <!-- Deliberately NOT public.3d-content. That conformance advertises
+           these files to every generic 3D handler, and SceneKit's Quick Look
+           extensions claim public.3d-content wholesale — they then win the
+           thumbnail/preview election for .step and .iges and return nothing,
+           because SceneKit cannot parse either format. Conforming to plain
+           public.data keeps the election with the handlers that name these
+           identifiers explicitly. -->
       <key>UTTypeConformsTo</key>
       <array>
         <string>public.data</string>
-        <string>public.3d-content</string>
       </array>
       <key>UTTypeTagSpecification</key>
       <dict>
@@ -115,10 +121,16 @@
       <string>io.github.broccoli-97.cadly.iges</string>
       <key>UTTypeDescription</key>
       <string>IGES Model</string>
+      <!-- Deliberately NOT public.3d-content. That conformance advertises
+           these files to every generic 3D handler, and SceneKit's Quick Look
+           extensions claim public.3d-content wholesale — they then win the
+           thumbnail/preview election for .step and .iges and return nothing,
+           because SceneKit cannot parse either format. Conforming to plain
+           public.data keeps the election with the handlers that name these
+           identifiers explicitly. -->
       <key>UTTypeConformsTo</key>
       <array>
         <string>public.data</string>
-        <string>public.3d-content</string>
       </array>
       <key>UTTypeTagSpecification</key>
       <dict>
