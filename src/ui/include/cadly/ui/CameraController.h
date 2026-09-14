@@ -69,6 +69,10 @@ public:
 
   void set_viewport(int w, int h);
   void frame_bounds(const scene::vec3& min, const scene::vec3& max);
+  // Orient to the platform's default view for a freshly opened model
+  // (scene::platform_default_view) and frame the bounds. Used once per
+  // document; later fits keep whatever orientation the user has orbited to.
+  void apply_default_view(const scene::vec3& min, const scene::vec3& max);
   // Restore a document's camera while refreshing the controller's cached
   // bounds for zoom and clip-plane calculations.
   void restore_camera(const scene::Camera& camera,

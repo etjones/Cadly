@@ -1,5 +1,6 @@
 add_library(cadly_scene STATIC
   src/Camera.cpp
+  src/DefaultView.cpp
   src/Scene.cpp
   src/Aabb.cpp
 )

@@ -169,9 +169,13 @@ void ViewportWidget::set_scene(std::shared_ptr<scene::Scene> scene, bool fit) {
   scene_dirty_ = true;
   if (scene_ && scene_->world_bounds.valid()) {
     if (fit) {
+      // First presentation of a document: open at the platform's default
+      // view so the app and the Quick Look preview agree. Re-fits after that
+      // (fit_view, double-click) keep the user's orientation.
       camera_->restore_camera(scene_->camera, scene_->world_bounds.min,
                               scene_->world_bounds.max);
-      camera_->frame_bounds(scene_->world_bounds.min, scene_->world_bounds.max);
+      camera_->apply_default_view(scene_->world_bounds.min,
+                                  scene_->world_bounds.max);
     } else {
       camera_->restore_camera(scene_->camera, scene_->world_bounds.min,
                               scene_->world_bounds.max);

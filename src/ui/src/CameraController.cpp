@@ -1,5 +1,7 @@
 #include "cadly/ui/CameraController.h"
 
+#include "cadly/scene/DefaultView.h"
+
 #include <algorithm>
 #include <cmath>
 #include <utility>
@@ -40,6 +42,17 @@ void CameraController::frame_bounds(const scene::vec3& min,
   camera_.aspect = static_cast<float>(viewport_w_) /
                    static_cast<float>(viewport_h_);
   camera_.frame_bounds(min, max);
+  update_clip_planes();
+  emit changed();
+}
+
+void CameraController::apply_default_view(const scene::vec3& min,
+                                          const scene::vec3& max) {
+  scene_center_ = 0.5f * (min + max);
+  scene_radius_ = std::max(0.5f * glm::length(max - min), 1e-4f);
+  camera_.aspect = static_cast<float>(viewport_w_) /
+                   static_cast<float>(viewport_h_);
+  scene::apply_default_view(camera_, min, max);
   update_clip_planes();
   emit changed();
 }

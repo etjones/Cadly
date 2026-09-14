@@ -124,6 +124,21 @@ void Camera::set_orientation_yaw_pitch(float yaw, float pitch) {
   orientation = glm::normalize(q_yaw * q_pitch);
 }
 
+void Camera::look_from(const vec3& eye_direction, const vec3& up) {
+  const vec3 forward = -glm::normalize(eye_direction);
+  vec3 right = glm::cross(forward, up);
+  if (glm::length(right) < 1e-5f) {
+    const vec3 fallback = std::abs(forward.y) < 0.9f ? vec3(0.0f, 1.0f, 0.0f)
+                                                     : vec3(0.0f, 0.0f, 1.0f);
+    right = glm::cross(forward, fallback);
+  }
+  right = glm::normalize(right);
+  const vec3 true_up = glm::cross(right, forward);
+  // Camera-to-world rotation. The identity camera looks down -Z, so the
+  // basis columns are (right, up, backward).
+  orientation = glm::normalize(glm::quat_cast(mat3(right, true_up, -forward)));
+}
+
 void Camera::frame_bounds(const vec3& min, const vec3& max, float fit_factor) {
   const vec3 center = 0.5f * (min + max);
   const vec3 extent = max - min;

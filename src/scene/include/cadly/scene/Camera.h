@@ -84,6 +84,14 @@ struct Camera {
   // Euler angles.
   void set_orientation_yaw_pitch(float yaw, float pitch);
 
+  // Reset the orientation from a look-at basis: the camera sits along
+  // `eye_direction` from the target (magnitude ignored) and treats `up` as
+  // up. Unlike set_orientation_yaw_pitch this carries no +Y-up assumption,
+  // so a +Z-up convention can be expressed directly. Target and distance are
+  // untouched. A view direction parallel to `up` (a plan view) picks an
+  // arbitrary perpendicular for right.
+  void look_from(const vec3& eye_direction, const vec3& up);
+
   // Frame the given world-space bounds with a small margin. `fit_factor` of
   // 1.0 places the box exactly inside the view frustum; larger numbers leave
   // padding around it.
