@@ -72,6 +72,13 @@ target_link_libraries(cadly_occt_classification_test PRIVATE Cadly::Cad Cadly::W
 target_include_directories(cadly_occt_classification_test SYSTEM PRIVATE ${OpenCASCADE_INCLUDE_DIR})
 add_test(NAME cadly_occt_classification COMMAND cadly_occt_classification_test)
 
+add_executable(cadly_cancellable_mesh_test cancellable_mesh_test.cpp)
+target_link_libraries(cadly_cancellable_mesh_test PRIVATE Cadly::Cad Cadly::Warnings)
+# Exercises the cad module's private shape_to_mesh() directly.
+target_include_directories(cadly_cancellable_mesh_test SYSTEM PRIVATE ${OpenCASCADE_INCLUDE_DIR})
+target_include_directories(cadly_cancellable_mesh_test PRIVATE ${CMAKE_SOURCE_DIR}/src/cad/src)
+add_test(NAME cadly_cancellable_mesh COMMAND cadly_cancellable_mesh_test)
+
 add_executable(cadly_ibl_bake_plan_test
   ibl_bake_plan_test.cpp
   ${CMAKE_SOURCE_DIR}/src/renderer_gl/src/IblBakePlan.cpp

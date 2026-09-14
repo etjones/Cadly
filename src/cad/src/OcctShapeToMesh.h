@@ -38,11 +38,14 @@ struct ConversionStats {
 // into the vertices AND assigning it to the submesh material used to square
 // the colour on screen.
 //
-// Returns an empty pointer if the shape has no usable triangulation.
+// Returns an empty pointer if the shape has no usable triangulation, or if
+// `progress` reports cancellation before or during the safety-net mesher
+// (which is bridged into OCCT so a budgeted import can abort mid-shape).
 std::shared_ptr<scene::Mesh>
 shape_to_mesh(const TopoDS_Shape& shape,
               const ImportOptions& options,
-              ConversionStats& stats);
+              ConversionStats& stats,
+              IProgressSink* progress = nullptr);
 
 // Walk an XDE document and emit one Mesh per shape entry, plus a flat scene
 // hierarchy that mirrors the assembly structure. The returned scene already

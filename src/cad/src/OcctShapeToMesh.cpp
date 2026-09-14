@@ -668,15 +668,32 @@ bool is_cull_safe(const TopoDS_Shape& shape) {
 std::shared_ptr<scene::Mesh>
 shape_to_mesh(const TopoDS_Shape& shape,
               const ImportOptions& opts,
-              ConversionStats& stats) {
+              ConversionStats& stats,
+              IProgressSink* progress) {
   using clock = std::chrono::steady_clock;
   if (shape.IsNull()) return nullptr;
+  if (progress && progress->cancelled()) return nullptr;
   // Safety net for faces the whole-document batch pass missed (or the
   // fallback path, which has no batch pass at all). Skipped entirely when
   // every face is already triangulated — see fully_triangulated().
+  //
+  // This mesher must be bridged into OCCT exactly like the batch pass is.
+  // Without a progress range BRepMesh never asks whether to stop, and on
+  // the no-XDE fallback path this call *is* the whole tessellation: a
+  // budgeted import (the Quick Look preview gives 20 s) was observed
+  // pinning five cores for over twenty minutes here, long after its sink
+  // had reported cancelled, because nothing in this function ever looked.
   if (!fully_triangulated(shape)) {
     auto phase_start = clock::now();
-    tessellate(shape, opts);
+    if (progress) {
+      Handle(OcctProgressBridge) bridge =
+        new OcctProgressBridge(*progress, 0.45f, 0.70f,
+                               "Tessellating geometry...");
+      tessellate(shape, opts, bridge->Start());
+      if (progress->cancelled()) return nullptr;
+    } else {
+      tessellate(shape, opts);
+    }
     if (opts.profile_timings) {
       add_timing(stats, "shape safety tessellation",
                  clock::now() - phase_start);
@@ -730,7 +747,8 @@ document_to_scene(const opencascade::handle<TDocStd_Document>& doc,
     apply_resolved_tessellation(stats, resolved);
     note_unbounded_faces(stats, unbounded_faces);
     auto phase_start = std::chrono::steady_clock::now();
-    auto mesh = shape_to_mesh(fallback_shape, resolved.options, stats);
+    auto mesh = shape_to_mesh(fallback_shape, resolved.options, stats,
+                              &progress);
     if (opts.profile_timings) {
       add_timing(stats, "fallback shape conversion",
                  std::chrono::steady_clock::now() - phase_start);
@@ -866,7 +884,7 @@ document_to_scene(const opencascade::handle<TDocStd_Document>& doc,
     const auto default_color =
       resolve_shape_color(color_tool, proto_label, shape);
     const auto phase_start = std::chrono::steady_clock::now();
-    auto mesh = shape_to_mesh(shape, resolved_opts, stats);
+    auto mesh = shape_to_mesh(shape, resolved_opts, stats, &progress);
     if (opts.profile_timings) {
       add_timing(stats, "shape conversion total",
                  std::chrono::steady_clock::now() - phase_start);
